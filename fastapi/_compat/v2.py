@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from copy import copy
 from dataclasses import dataclass, is_dataclass
 from enum import Enum
-from functools import lru_cache
+from functools import cached_property, lru_cache
 from typing import (
     Annotated,
     Any,
@@ -137,6 +137,11 @@ class ModelField:
     @property
     def default(self) -> Any:
         return self.get_default()
+
+    @cached_property
+    def annotation_is_sequence(self) -> bool:
+        # Cached as it's checked for each parameter on every request
+        return shared.field_annotation_is_sequence(self.field_info.annotation)
 
     def __post_init__(self) -> None:
         with warnings.catch_warnings():

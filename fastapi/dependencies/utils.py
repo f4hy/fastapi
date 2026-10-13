@@ -36,7 +36,6 @@ from fastapi._compat import (
     evaluate_forwardref,
     field_annotation_is_scalar,
     field_annotation_is_scalar_sequence,
-    field_annotation_is_sequence,
     get_cached_model_fields,
     get_missing_field_error,
     is_bytes_or_nonable_bytes_annotation,
@@ -752,7 +751,7 @@ def _get_multidict_value(
     alias = alias or get_validation_alias(field)
     if (
         (not _is_json_field(field))
-        and field_annotation_is_sequence(field.field_info.annotation)
+        and field.annotation_is_sequence
         and isinstance(values, (ImmutableMultiDict, Headers))
     ):
         value = values.getlist(alias)
@@ -765,10 +764,7 @@ def _get_multidict_value(
             and isinstance(value, str)  # For type checks
             and value == ""
         )
-        or (
-            field_annotation_is_sequence(field.field_info.annotation)
-            and len(value) == 0
-        )
+        or (field.annotation_is_sequence and len(value) == 0)
     ):
         if field.field_info.is_required():
             return
